@@ -5,6 +5,8 @@ extern sum_of_three
         FLAGS equ 0x0
         CHECKSUM equ -MAGIC_NUMBER
         KERNEL_STACK_SIZE equ 4096
+        LETTER_A equ 0xf041
+        LETTER_B equ 0xf042
 
 section .bss
 align 4
@@ -19,9 +21,7 @@ align 4
 
 loader:
         mov esp, kernel_stack + KERNEL_STACK_SIZE
-        push dword 3
-        push dword 2
-        push dword 1
-        call sum_of_three
+        mov [0x000B8000], word LETTER_A
+        mov [0x000B8002], word LETTER_B
 .loop:
         jmp .loop
