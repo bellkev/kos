@@ -12,6 +12,6 @@ align 4                         ; the code must be 4 byte aligned
     dd CHECKSUM                 ; and the checksum
 
 loader:                         ; the loader label (defined as entry point in linker script)
-    mov eax, 0xCAFEBABE         ; place the number 0xCAFEBABE in the register eax
+    mov eax, 0xBABEBABE         ; place the number 0xBABEBABE in the register eax
 .loop:
     jmp .loop                   ; loop forever
