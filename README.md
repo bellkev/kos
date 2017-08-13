@@ -16,5 +16,15 @@ Framebuffer:
 * Okay, I guess this could actually be a difference in endianness somewhere between my setup and littleosbook...
 
 LD:
+
 * https://www.math.utah.edu/docs/info/ld_3.html is a useful overview of the scripting format
 * Turns out `section .text:` (with a colon) is extra not-good. (The `.text:` section isn't caught by the `.text` label in the linker script, meaning it winds up too far down the file for GRUB to find the multiboot header.)
+
+VGA:
+
+* Further reading: http://wiki.osdev.org/VGA_Hardware
+
+
+x86:
+* Syntax like `out 0x3D4, 14` doesn't seem to work at all... Even `out imm8 AL` type operands don't seem to work for the ~16bit cursor port address, resulting in `warning: unsigned byte value exceeds bounds` from `nasm`. Only had success with `out dx, al`.
+* Useful register reference: http://www.cs.virginia.edu/~evans/cs216/guides/x86.html
