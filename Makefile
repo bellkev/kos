@@ -9,6 +9,7 @@ ASFLAGS = -f elf
 all: os.iso
 
 kernel.elf: $(OBJECTS)
+	echo "ld $(LDFLAGS) $(OBJECTS) -o kernel.elf"
 	ld $(LDFLAGS) $(OBJECTS) -o kernel.elf
 
 os.iso: kernel.elf
