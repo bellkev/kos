@@ -20,25 +20,9 @@ align 4
         dd CHECKSUM
 
 loader:
+        ;; Set up stack and call hello fn
         mov esp, kernel_stack + KERNEL_STACK_SIZE
         call hello
-        ; 0x3D4 is the port that describes the data
-        ; and port 0x3D5 is the data itself
-        mov dx, 0x3D4
-        mov al, 14
-        out dx, al
-
-        mov dx, 0x3D5
-        mov al, 0
-        out dx, al
-
-        mov dx, 0x3D4
-        mov al, 15
-        out dx, al
-
-        mov dx, 0x3D5
-        mov al, 15
-        out dx, al
 
 .loop:
         jmp .loop
