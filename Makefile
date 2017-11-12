@@ -1,10 +1,10 @@
-OBJECTS = interrupt.o io.o loader.o kmain.o
+OBJECTS = interrupt_macro.o interrupt.o io.o loader.o kmain.o
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
-	 -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c
+	 -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c -ggdb
 LDFLAGS = -T link.ld -melf_i386
 AS = nasm
-ASFLAGS = -f elf
+ASFLAGS = -f elf -Fdwarf -g
 
 all: os.iso
 

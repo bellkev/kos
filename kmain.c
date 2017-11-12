@@ -162,7 +162,7 @@ void sane_interrupts() {
     outb( 0xff, 0xA1 ); /* slave PIC */
 }
 
-struct cpu_state {
+struct cpu_state { 
   unsigned int eax;
   unsigned int ebx;
   unsigned int ecx;
@@ -399,9 +399,9 @@ void interrupt_handler(struct cpu_state cpu, struct stack_state stack, unsigned 
     UNUSED(stack);
     UNUSED(interrupt);
         
-    /* char * serial_message = "Interrupt!"; */
-    /* for (int i = 0; i < 10; i++) { */
-    /*     outb(SERIAL_DATA_PORT(SERIAL_COM1_BASE), serial_message[i]); */
-    /* } */
-    /* outb(SERIAL_DATA_PORT(SERIAL_COM1_BASE), 10);     */
+    char * serial_message = "Interrupt!";
+    for (int i = 0; i < 10; i++) {
+        outb(SERIAL_DATA_PORT(SERIAL_COM1_BASE), serial_message[i]);
+    }
+    outb(SERIAL_DATA_PORT(SERIAL_COM1_BASE), 10);
 }
