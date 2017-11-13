@@ -1,4 +1,5 @@
 #include "io.h"
+#include "pic.h"
 
 #define UNUSED(x) (void)(x)
 
@@ -138,29 +139,6 @@ struct idt_spec {
 } __attribute__((packed));
 
 void load_idt(struct idt_spec * idt);
-
-/* https://www-s.acm.illinois.edu/sigops/2007/roll_your_own/i386/irq.html */
-void sane_interrupts() {
-    /* ICW1 */
-    outb( 0x11, 0x20 ); /* Master port A */
-    outb( 0x11, 0xA0 ); /* Slave port A */
-
-    /* ICW2 */
-    outb( 0x20, 0x21 ); /* Master offset of 0x20 in the IDT */
-    outb( 0x28, 0xA1 ); /* Master offset of 0x28 in the IDT */
-
-    /* ICW3 */
-    outb( 0x04, 0x21 ); /* Slaves attached to IR line 2 */
-    outb( 0x02, 0xA1 ); /* This slave in IR line 2 of master */
-
-    /* ICW4 */
-    outb( 0x05, 0x21 ); /* Set as master */
-    outb( 0x01, 0xA1 ); /* Set as slave */
-
-    /* Mask everything but the keyboard */
-    outb( 0xfd, 0x21 ); /* master PIC */
-    outb( 0xff, 0xA1 ); /* slave PIC */
-}
 
 struct cpu_state { 
   unsigned int eax;
@@ -318,11 +296,11 @@ void hello() {
     serial_configure_modem(SERIAL_COM1_BASE);
 
     while (!serial_is_transmit_fifo_empty(SERIAL_COM1_BASE));
-    char * serial_message = "Hey there!";
-    for (int i = 0; i < 10; i++) {
-        outb(SERIAL_DATA_PORT(SERIAL_COM1_BASE), serial_message[i]);
-    }
-    outb(SERIAL_DATA_PORT(SERIAL_COM1_BASE), 10);
+    /* char * serial_message = "Hey there!"; */
+    /* for (int i = 0; i < 10; i++) { */
+    /*     outb(SERIAL_DATA_PORT(SERIAL_COM1_BASE), serial_message[i]); */
+    /* } */
+    /* outb(SERIAL_DATA_PORT(SERIAL_COM1_BASE), 10); */
 
 
     init_segmentation();
@@ -386,22 +364,41 @@ void hello() {
     load_idt(&idt);
     set_interrupt();
 
-    /* Framebuffer */
-    char * message = "Hello, World!!!";
-    for (int i = 0; i < 15; i++) {
-        fb_write_cell(i, message[i], FB_BLACK, FB_WHITE);
-    }
-    fb_move_cursor(15);
+    /* /\* Framebuffer *\/ */
+    /* char * message = "Hello, World!!!"; */
+    /* for (int i = 0; i < 15; i++) { */
+    /*     fb_write_cell(i, message[i], FB_BLACK, FB_WHITE); */
+    /* } */
+    /* fb_move_cursor(15); */
 }
 
-void interrupt_handler(struct cpu_state cpu, struct stack_state stack, unsigned int interrupt) {
+#define KBD_DATA_PORT   0x60
+
+/** read_scan_code:
+ *  Reads a scan code from the keyboard
+ *
+ *  @return The scan code (NOT an ASCII character!)
+ */
+unsigned char read_scan_code(void)
+{
+    return inb(KBD_DATA_PORT);
+}
+
+void interrupt_handler(struct cpu_state cpu, unsigned int interrupt, struct stack_state stack) {
     UNUSED(cpu);
     UNUSED(stack);
-    UNUSED(interrupt);
-        
-    char * serial_message = "Interrupt!";
-    for (int i = 0; i < 10; i++) {
-        outb(SERIAL_DATA_PORT(SERIAL_COM1_BASE), serial_message[i]);
+    /* UNUSED(interrupt); */
+
+    /* Only listen to the keyboard */
+    if (interrupt >= 0x20 && interrupt < 0x30) {
+        unsigned char key = read_scan_code();
+        UNUSED(key);
+        char * serial_message = "Key Pressed!";
+        for (int i = 0; i < 12; i++) {
+            outb(SERIAL_DATA_PORT(SERIAL_COM1_BASE), serial_message[i]);
+        }
+        outb(SERIAL_DATA_PORT(SERIAL_COM1_BASE), 10);
+        /* ACK */
+        outb( 0x20, 0x20 ); /* master PIC */
     }
-    outb(SERIAL_DATA_PORT(SERIAL_COM1_BASE), 10);
 }

@@ -29,7 +29,7 @@ common_interrupt_handler:               ; the common parts of the generic interr
   ; Don't need to pop esp, that's done below.
 
   ; pop esp, interrupt_number, and error_code
-  ;; add     esp, 12
+  add     esp, 12
 
   ; return to the code that got interrupted
   iret                

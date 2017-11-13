@@ -1,0 +1,1 @@
+void sane_interrupts();
