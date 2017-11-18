@@ -1,5 +1,7 @@
 #include "io.h"
 #include "pic.h"
+#include "serial.h"
+#include "utils.h"
 
 #define UNUSED(x) (void)(x)
 
@@ -14,88 +16,6 @@
 /* Some colors */
 #define FB_BLACK 0
 #define FB_WHITE 15
-
-/* The I/O ports */
-
-/* All the I/O ports are calculated relative to the data port. This is because
- * all serial ports (COM1, COM2, COM3, COM4) have their ports in the same
- * order, but they start at different values.
- */
-
-#define SERIAL_COM1_BASE                0x3F8      /* COM1 base port */
-
-#define SERIAL_DATA_PORT(base)          (base)
-#define SERIAL_FIFO_COMMAND_PORT(base)  (base + 2)
-#define SERIAL_LINE_COMMAND_PORT(base)  (base + 3)
-#define SERIAL_MODEM_COMMAND_PORT(base) (base + 4)
-#define SERIAL_LINE_STATUS_PORT(base)   (base + 5)
-
-/* The I/O port commands */
-
-/* SERIAL_LINE_ENABLE_DLAB:
- * Tells the serial port to expect first the highest 8 bits on the data port,
- * then the lowest 8 bits will follow
- */
-#define SERIAL_LINE_ENABLE_DLAB         0x80
-
-/** serial_configure_baud_rate:
- *  Sets the speed of the data being sent. The default speed of a serial
- *  port is 115200 bits/s. The argument is a divisor of that number, hence
- *  the resulting speed becomes (115200 / divisor) bits/s.
- *
- *  @param com      The COM port to configure
- *  @param divisor  The divisor
- */
-void serial_configure_baud_rate(unsigned short com, unsigned short divisor)
-{
-    outb(SERIAL_LINE_COMMAND_PORT(com),
-         SERIAL_LINE_ENABLE_DLAB);
-    outb(SERIAL_DATA_PORT(com),
-         (divisor >> 8) & 0x00FF);
-    outb(SERIAL_DATA_PORT(com),
-         divisor & 0x00FF);
-}
-
-/** serial_configure_line:
- *  Configures the line of the given serial port. The port is set to have a
- *  data length of 8 bits, no parity bits, one stop bit and break control
- *  disabled.
- *
- *  @param com  The serial port to configure
- */
-void serial_configure_line(unsigned short com)
-{
-    /* Bit:     | 7 | 6 | 5 4 3 | 2 | 1 0 |
-     * Content: | d | b | prty  | s | dl  |
-     * Value:   | 0 | 0 | 0 0 0 | 0 | 1 1 | = 0x03
-     */
-    outb(SERIAL_LINE_COMMAND_PORT(com), 0x03);
-}
-
-void serial_configure_buffer(unsigned short com)
-{
-    outb(SERIAL_FIFO_COMMAND_PORT(com), 0xC7);
-}
-
-void serial_configure_modem(unsigned short com)
-{
-    outb(SERIAL_MODEM_COMMAND_PORT(com), 0x03);
-}
-
-
-/** serial_is_transmit_fifo_empty:
- *  Checks whether the transmit FIFO queue is empty or not for the given COM
- *  port.
- *
- *  @param  com The COM port
- *  @return 0 if the transmit FIFO queue is not empty
- *          1 if the transmit FIFO queue is empty
- */
-int serial_is_transmit_fifo_empty(unsigned int com)
-{
-    /* 0x20 = 0010 0000 */
-    return inb(SERIAL_LINE_STATUS_PORT(com)) & 0x20;
-}
 
 /** fb_move_cursor:
  *  Moves the cursor of the framebuffer to the given position
@@ -129,7 +49,7 @@ struct segment_descriptor {
     unsigned short base_15_0;
     unsigned char base_23_16;
     unsigned short flags;
-    unsigned char base_31_24;    
+    unsigned char base_31_24;
 } __attribute__((packed));
 
 
@@ -140,7 +60,7 @@ struct idt_spec {
 
 void load_idt(struct idt_spec * idt);
 
-struct cpu_state { 
+struct cpu_state {
   unsigned int eax;
   unsigned int ebx;
   unsigned int ecx;
@@ -232,7 +152,7 @@ struct segment_descriptor gdt[5];
 
 void init_segmentation() {
   // leave 0 (null) segment as is
-  
+
   // segment 1 is for code
   gdt[1].base_31_24 = 0x00;
   // 0b1100 (4 byte granularity, 32-bit operations, no 64-bit operations)
@@ -254,7 +174,7 @@ void init_segmentation() {
   gdt[2].base_23_16 = 0x00;
   gdt[2].base_15_0 = 0x0000;
   gdt[2].limit = 0xFFFF;
-  
+
   // segment 3 is for user code
   gdt[3].base_31_24 = 0x00;
   // 0b1100 (4 byte granularity, 32-bit operations, no 64-bit operations)
@@ -289,24 +209,11 @@ struct idt_entry table[48];
 
 void hello() {
 
-    /* Serial Logging */
-    serial_configure_baud_rate(SERIAL_COM1_BASE, 2);
-    serial_configure_line(SERIAL_COM1_BASE);
-    serial_configure_buffer(SERIAL_COM1_BASE);
-    serial_configure_modem(SERIAL_COM1_BASE);
-
-    while (!serial_is_transmit_fifo_empty(SERIAL_COM1_BASE));
-    /* char * serial_message = "Hey there!"; */
-    /* for (int i = 0; i < 10; i++) { */
-    /*     outb(SERIAL_DATA_PORT(SERIAL_COM1_BASE), serial_message[i]); */
-    /* } */
-    /* outb(SERIAL_DATA_PORT(SERIAL_COM1_BASE), 10); */
-
-
+    init_serial();
     init_segmentation();
 
     /* Interrupts */
-    clear_interrupt();    
+    clear_interrupt();
     sane_interrupts();
     fill_idt_entry(&table[0], (unsigned int)interrupt_handler_0);
     fill_idt_entry(&table[1], (unsigned int)interrupt_handler_1);
@@ -356,7 +263,7 @@ void hello() {
     fill_idt_entry(&table[45], (unsigned int)interrupt_handler_45);
     fill_idt_entry(&table[46], (unsigned int)interrupt_handler_46);
     fill_idt_entry(&table[47], (unsigned int)interrupt_handler_47);
-    
+
 
     struct idt_spec idt;
     idt.size = sizeof(table);
@@ -364,12 +271,12 @@ void hello() {
     load_idt(&idt);
     set_interrupt();
 
-    /* /\* Framebuffer *\/ */
-    /* char * message = "Hello, World!!!"; */
-    /* for (int i = 0; i < 15; i++) { */
-    /*     fb_write_cell(i, message[i], FB_BLACK, FB_WHITE); */
-    /* } */
-    /* fb_move_cursor(15); */
+    /* Framebuffer */
+    char * message = "Hello, World!!!";
+    for (int i = 0; i < 15; i++) {
+        fb_write_cell(i, message[i], FB_BLACK, FB_WHITE);
+    }
+    fb_move_cursor(15);
 }
 
 #define KBD_DATA_PORT   0x60
@@ -392,12 +299,7 @@ void interrupt_handler(struct cpu_state cpu, unsigned int interrupt, struct stac
     /* Only listen to the keyboard */
     if (interrupt >= 0x20 && interrupt < 0x30) {
         unsigned char key = read_scan_code();
-        UNUSED(key);
-        char * serial_message = "Key Pressed!";
-        for (int i = 0; i < 12; i++) {
-            outb(SERIAL_DATA_PORT(SERIAL_COM1_BASE), serial_message[i]);
-        }
-        outb(SERIAL_DATA_PORT(SERIAL_COM1_BASE), 10);
+        log_hex(key);
         /* ACK */
         outb( 0x20, 0x20 ); /* master PIC */
     }

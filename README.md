@@ -28,3 +28,6 @@ VGA:
 x86:
 * Syntax like `out 0x3D4, 14` doesn't seem to work at all... Even `out imm8 AL` type operands don't seem to work for the ~16bit cursor port address, resulting in `warning: unsigned byte value exceeds bounds` from `nasm`. Only had success with `out dx, al`.
 * Useful register reference: http://www.cs.virginia.edu/~evans/cs216/guides/x86.html
+
+qemu fullscreen:
+* `s/[NSScreen mainScreen]/[[NSScreen screens] objectAtIndex:0]/` (in QEMU source) let's you start the QEMU screen in a specific display, rather than the one currently receiving keyboard events
