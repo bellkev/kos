@@ -82,14 +82,14 @@ int serial_is_transmit_fifo_empty(unsigned int com)
     return inb(SERIAL_LINE_STATUS_PORT(com)) & 0x20;
 }
 
-void init_serial() {
+void serial_init() {
     serial_configure_baud_rate(SERIAL_COM1_BASE, 2);
     serial_configure_line(SERIAL_COM1_BASE);
     serial_configure_buffer(SERIAL_COM1_BASE);
     serial_configure_modem(SERIAL_COM1_BASE);
 }
 
-void write_serial(char c) {
+void serial_write(char c) {
     while (!serial_is_transmit_fifo_empty(SERIAL_COM1_BASE));
     outb(SERIAL_DATA_PORT(SERIAL_COM1_BASE), c);
 }

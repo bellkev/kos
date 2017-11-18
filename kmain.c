@@ -1,41 +1,11 @@
+#include "framebuffer.h"
 #include "io.h"
 #include "pic.h"
 #include "serial.h"
+#include "scancodes.h"
 #include "utils.h"
 
 #define UNUSED(x) (void)(x)
-
-/* The I/O ports */
-#define FB_COMMAND_PORT         0x3D4
-#define FB_DATA_PORT            0x3D5
-
-/* The I/O port commands */
-#define FB_HIGH_BYTE_COMMAND    14
-#define FB_LOW_BYTE_COMMAND     15
-
-/* Some colors */
-#define FB_BLACK 0
-#define FB_WHITE 15
-
-/** fb_move_cursor:
- *  Moves the cursor of the framebuffer to the given position
- *
- *  @param pos The new position of the cursor
- */
-void fb_move_cursor(unsigned short pos)
-{
-    outb(FB_COMMAND_PORT, FB_HIGH_BYTE_COMMAND);
-    outb(FB_DATA_PORT,    ((pos >> 8) & 0x00FF));
-    outb(FB_COMMAND_PORT, FB_LOW_BYTE_COMMAND);
-    outb(FB_DATA_PORT,    pos & 0x00FF);
-}
-
-char * fb = (char *) 0x000B8000;
-
-void fb_write_cell(unsigned int i, char c, unsigned char fg, unsigned char bg) {
-    fb[i * 2] = c;
-    fb[i * 2 + 1] = ((fg & 0x0F) << 4) | (bg & 0x0F);
-}
 
 struct gdt_spec {
     unsigned short size;
@@ -206,10 +176,11 @@ void init_segmentation() {
 
 
 struct idt_entry table[48];
+int cursor = 0;
 
 void hello() {
 
-    init_serial();
+    serial_init();
     init_segmentation();
 
     /* Interrupts */
@@ -274,9 +245,8 @@ void hello() {
     /* Framebuffer */
     char * message = "Hello, World!!!";
     for (int i = 0; i < 15; i++) {
-        fb_write_cell(i, message[i], FB_BLACK, FB_WHITE);
+        fb_write(&cursor, message[i]);
     }
-    fb_move_cursor(15);
 }
 
 #define KBD_DATA_PORT   0x60
@@ -299,7 +269,12 @@ void interrupt_handler(struct cpu_state cpu, unsigned int interrupt, struct stac
     /* Only listen to the keyboard */
     if (interrupt >= 0x20 && interrupt < 0x30) {
         unsigned char key = read_scan_code();
+        log("Key scan code received:");
         log_hex(key);
+        int ascii = code_to_ascii(key);
+        if (ascii) {
+            fb_write(&cursor, ascii);
+        }
         /* ACK */
         outb( 0x20, 0x20 ); /* master PIC */
     }

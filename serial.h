@@ -1,2 +1,2 @@
-void init_serial();
-void write_serial(char c);
+void serial_init();
+void serial_write(char c);

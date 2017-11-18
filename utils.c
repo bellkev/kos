@@ -5,9 +5,9 @@ void log(char * s) {
         if (s[i] == 0) {
             break;
         }
-        write_serial(s[i]);
+        serial_write(s[i]);
     }
-    write_serial(10);
+    serial_write(10);
 }
 
 void log_hex(int d) {
@@ -18,12 +18,12 @@ void log_hex(int d) {
                          0x38, 0x39, 0x41, 0x42,
                          0x43, 0x44, 0x45, 0x46};
 
-    write_serial('0');
-    write_serial('x');
+    serial_write('0');
+    serial_write('x');
 
     for (int i = 28; i >= 0; i-=4) {
-        write_serial(ascii_codes[(d >> i) & 0xf]);
+        serial_write(ascii_codes[(d >> i) & 0xf]);
     }
 
-    write_serial(10);
+    serial_write(10);
 }

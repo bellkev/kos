@@ -1,4 +1,4 @@
-OBJECTS = interrupt_macro.o interrupt.o io.o pic.o loader.o kmain.o serial.o utils.o
+OBJECTS = interrupt_macro.o interrupt.o io.o pic.o loader.o kmain.o serial.o utils.o framebuffer.o scancodes.o
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
 	 -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c -ggdb
