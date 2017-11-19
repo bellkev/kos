@@ -35,3 +35,6 @@ qemu fullscreen:
 Storing programs in modules:
 * [BITS 32] seems to be necessary
 * multiboot.h on master in grub seems to have issues now, using https://www.gnu.org/software/grub/manual/multiboot/html_node/multiboot_002eh.html
+
+Paging:
+* http://wiki.osdev.org/Higher_Half_bare_bones
