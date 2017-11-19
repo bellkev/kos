@@ -12,7 +12,11 @@ kernel.elf: $(OBJECTS)
 	echo "ld $(LDFLAGS) $(OBJECTS) -o kernel.elf"
 	ld $(LDFLAGS) $(OBJECTS) -o kernel.elf
 
-os.iso: kernel.elf
+hello:
+	mkdir -p disk/modules
+	nasm -f bin hello.s -o disk/modules/hello
+
+os.iso: kernel.elf hello
 	mkdir -p disk/boot/grub
 	cp grub.cfg disk/boot/grub
 	cp kernel.elf disk/boot/kernel.elf

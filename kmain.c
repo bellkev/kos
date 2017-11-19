@@ -1,3 +1,5 @@
+#include "multiboot.h"
+
 #include "framebuffer.h"
 #include "io.h"
 #include "pic.h"
@@ -178,9 +180,20 @@ void init_segmentation() {
 struct idt_entry table[48];
 int cursor = 0;
 
-void hello() {
+typedef void (*call_module_t)(void);
+
+void kmain(unsigned int ebx) {
 
     serial_init();
+
+    multiboot_info_t *mbinfo = (multiboot_info_t *) ebx;
+    multiboot_module_t *mod = (multiboot_module_t *) mbinfo->mods_addr;
+    void(*start_program)(void) = (void(*)(void)) mod->mod_start;
+    log("mods_count:");
+    log_hex(mbinfo->mods_count);
+    start_program();
+
+
     init_segmentation();
 
     /* Interrupts */

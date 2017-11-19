@@ -31,3 +31,7 @@ x86:
 
 qemu fullscreen:
 * `s/[NSScreen mainScreen]/[[NSScreen screens] objectAtIndex:0]/` (in QEMU source) let's you start the QEMU screen in a specific display, rather than the one currently receiving keyboard events
+
+Storing programs in modules:
+* [BITS 32] seems to be necessary
+* multiboot.h on master in grub seems to have issues now, using https://www.gnu.org/software/grub/manual/multiboot/html_node/multiboot_002eh.html
