@@ -1,16 +1,20 @@
 global loader
 extern kmain
+extern kernel_virtual_start
+extern kernel_virtual_end
+extern kernel_physical_start
+extern kernel_physical_end
 
-        MAGIC_NUMBER equ 0x1BADB002
-        ALIGN_MODULES equ 1<<0
-        MEM_INFO equ 1<<1
-        FLAGS equ ALIGN_MODULES
-        CHECKSUM equ -(MAGIC_NUMBER + FLAGS)
-        KERNEL_STACK_SIZE equ 4096
-        LETTER_A equ 0xf041
-        LETTER_B equ 0xf042
-        KERNEL_VIRTUAL_BASE equ 0xC0000000                  ; 3GB
-        KERNEL_PAGE_INDEX equ (KERNEL_VIRTUAL_BASE >> 22)  ; Page directory index of kernel's 4MB PTE.
+MAGIC_NUMBER equ 0x1BADB002
+ALIGN_MODULES equ 1<<0
+MEM_INFO equ 1<<1
+FLAGS equ ALIGN_MODULES
+CHECKSUM equ -(MAGIC_NUMBER + FLAGS)
+KERNEL_STACK_SIZE equ 4096
+LETTER_A equ 0xf041
+LETTER_B equ 0xf042
+KERNEL_VIRTUAL_BASE equ 0xC0000000                  ; 3GB
+KERNEL_PAGE_INDEX equ (KERNEL_VIRTUAL_BASE >> 22)  ; Page directory index of kernel's 4MB PTE.
 
 section .bss
 align 4
@@ -74,8 +78,14 @@ higher_half:
         ; should be necessary. We now have a higher-half kernel.
         mov esp, kernel_stack + KERNEL_STACK_SIZE           ; set up the stack
 
-        ; pass Multiboot info structure -- WARNING: This is a physical address and may not be
-        ; in the first 4MB!
+        ; Pass info about where the kernel is loaded
+        push kernel_physical_end
+        push kernel_physical_start
+        push kernel_virtual_end
+        push kernel_virtual_start
+
+        ; pass Multiboot info structure
+        ; WARNING: This is a physical address and may not be in the first 4MB!
         push ebx
 
         call kmain

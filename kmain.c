@@ -185,11 +185,20 @@ int cursor = 0;
 
 typedef void (*call_module_t)(void);
 
-void kmain(unsigned int ebx) {
+struct kernel_mem_info {
+    unsigned int kernel_virtual_start;
+    unsigned int kernel_virtual_end;
+    unsigned int kernel_physical_start;
+    unsigned int kernel_physical_end;
+} __attribute__((packed));
+
+
+void kmain(unsigned int ebx, struct kernel_mem_info kmi) {
 
     serial_init();
 
-    /* UNUSED(ebx); */
+    UNUSED(kmi);
+
     multiboot_info_t *mbinfo = (multiboot_info_t *) VIRTUAL_ADDR(ebx);
 
     if (!(MULTIBOOT_INFO_MODS & mbinfo->flags)) {
