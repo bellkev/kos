@@ -187,7 +187,7 @@ void kmain(unsigned int ebx) {
     serial_init();
 
     UNUSED(ebx);
-    /* multiboot_info_t *mbinfo = (multiboot_info_t *) ebx; */
+    /* multiboot_info_t *mbinfo = (multiboot_info_t *) (ebx + 0xC0000000); */
     /* multiboot_module_t *mod = (multiboot_module_t *) mbinfo->mods_addr; */
     /* void(*start_program)(void) = (void(*)(void)) mod->mod_start; */
     /* log("mods_count:"); */

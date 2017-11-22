@@ -38,3 +38,6 @@ Storing programs in modules:
 
 Paging:
 * http://wiki.osdev.org/Higher_Half_bare_bones
+* Unlike in ^^, GRUB appears to know to use the physical address of the entrypoint
+* Note that it is the _physical_ address of the page directory that must be loaded into cr3
+* mem_* fields in multiboot info structure seem to be populated even without setting the corresponding flag in the multiboot header, but will set anyway

@@ -2,8 +2,10 @@ global loader
 extern kmain
 
         MAGIC_NUMBER equ 0x1BADB002
-        ALIGN_MODULES equ 0x00000001
-        CHECKSUM equ -(MAGIC_NUMBER + ALIGN_MODULES)
+        ALIGN_MODULES equ 1<<0
+        MEM_INFO equ 1<<1
+        FLAGS equ ALIGN_MODULES | MEM_INFO
+        CHECKSUM equ -(MAGIC_NUMBER + FLAGS)
         KERNEL_STACK_SIZE equ 4096
         LETTER_A equ 0xf041
         LETTER_B equ 0xf042
@@ -35,7 +37,7 @@ page_directory:
 section .text
 align 4
         dd MAGIC_NUMBER
-        dd ALIGN_MODULES
+        dd FLAGS
         dd CHECKSUM
 
 loader:
