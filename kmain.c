@@ -186,12 +186,13 @@ void kmain(unsigned int ebx) {
 
     serial_init();
 
-    multiboot_info_t *mbinfo = (multiboot_info_t *) ebx;
-    multiboot_module_t *mod = (multiboot_module_t *) mbinfo->mods_addr;
-    void(*start_program)(void) = (void(*)(void)) mod->mod_start;
-    log("mods_count:");
-    log_hex(mbinfo->mods_count);
-    start_program();
+    UNUSED(ebx);
+    /* multiboot_info_t *mbinfo = (multiboot_info_t *) ebx; */
+    /* multiboot_module_t *mod = (multiboot_module_t *) mbinfo->mods_addr; */
+    /* void(*start_program)(void) = (void(*)(void)) mod->mod_start; */
+    /* log("mods_count:"); */
+    /* log_hex(mbinfo->mods_count); */
+    /* start_program(); */
 
 
     init_segmentation();
@@ -255,11 +256,12 @@ void kmain(unsigned int ebx) {
     load_idt(&idt);
     set_interrupt();
 
-    /* Framebuffer */
-    char * message = "Hello, World!!!";
-    for (int i = 0; i < 15; i++) {
-        fb_write(&cursor, message[i]);
-    }
+    /* /\* Framebuffer *\/ */
+    /* char * message = "Hello, World!!!"; */
+    /* for (int i = 0; i < 15; i++) { */
+    /*     fb_write(&cursor, message[i]); */
+    /* } */
+    log("In the higher half!");
 }
 
 #define KBD_DATA_PORT   0x60
