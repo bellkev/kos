@@ -3,8 +3,6 @@ global common_interrupt_handler
 extern interrupt_handler
 
 common_interrupt_handler:               ; the common parts of the generic interrupt handler
-        ;; mov eax, 0xDEADBEEF
-        ;; jmp $
   ; save the registers in a CpuState struct, see interrupts.h
   push    esp
   push    ebp
@@ -32,7 +30,7 @@ common_interrupt_handler:               ; the common parts of the generic interr
   add     esp, 12
 
   ; return to the code that got interrupted
-  iret                
+  iret
 
 ; load_idt - Loads the interrupt descriptor table (IDT).
 ; stack: [esp + 4] the address of the first entry in the IDT

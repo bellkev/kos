@@ -4,7 +4,7 @@ extern kmain
         MAGIC_NUMBER equ 0x1BADB002
         ALIGN_MODULES equ 1<<0
         MEM_INFO equ 1<<1
-        FLAGS equ ALIGN_MODULES | MEM_INFO
+        FLAGS equ ALIGN_MODULES
         CHECKSUM equ -(MAGIC_NUMBER + FLAGS)
         KERNEL_STACK_SIZE equ 4096
         LETTER_A equ 0xf041

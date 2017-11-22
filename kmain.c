@@ -7,6 +7,9 @@
 #include "scancodes.h"
 #include "utils.h"
 
+#define KERNEL_VIRTUAL_BASE 0xC0000000
+#define VIRTUAL_ADDR(x) (x + KERNEL_VIRTUAL_BASE)
+
 #define UNUSED(x) (void)(x)
 
 struct gdt_spec {
@@ -186,13 +189,26 @@ void kmain(unsigned int ebx) {
 
     serial_init();
 
-    UNUSED(ebx);
-    /* multiboot_info_t *mbinfo = (multiboot_info_t *) (ebx + 0xC0000000); */
-    /* multiboot_module_t *mod = (multiboot_module_t *) mbinfo->mods_addr; */
-    /* void(*start_program)(void) = (void(*)(void)) mod->mod_start; */
-    /* log("mods_count:"); */
-    /* log_hex(mbinfo->mods_count); */
-    /* start_program(); */
+    /* UNUSED(ebx); */
+    multiboot_info_t *mbinfo = (multiboot_info_t *) VIRTUAL_ADDR(ebx);
+
+    if (!(MULTIBOOT_INFO_MODS & mbinfo->flags)) {
+        log("No modules loaded");
+        return;
+    }
+    if (!(MULTIBOOT_INFO_MEMORY & mbinfo->flags)) {
+        log("Memory info unavailable");
+        return;
+    }
+    if (mbinfo->mods_count != 1) {
+        log("Unexpected number of modules loaded");
+        return;
+    }
+
+    multiboot_module_t *mod = (multiboot_module_t *) VIRTUAL_ADDR(mbinfo->mods_addr);
+    void(*start_program)(void) = (void(*)(void)) VIRTUAL_ADDR(mod->mod_start);
+
+    start_program();
 
 
     init_segmentation();
