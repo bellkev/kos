@@ -256,11 +256,14 @@ void kmain(unsigned int ebx) {
     load_idt(&idt);
     set_interrupt();
 
-    /* /\* Framebuffer *\/ */
-    /* char * message = "Hello, World!!!"; */
-    /* for (int i = 0; i < 15; i++) { */
-    /*     fb_write(&cursor, message[i]); */
-    /* } */
+    /* Framebuffer */
+    char * message = "Hello, World!!!";
+    for (int i = 0;; i++) {
+        if (message[i] == 0) {
+            break;
+        }
+        fb_write(&cursor, message[i]);
+    }
     log("In the higher half!");
 }
 

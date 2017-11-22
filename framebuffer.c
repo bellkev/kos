@@ -25,7 +25,7 @@ void fb_move_cursor(unsigned short pos)
     outb(FB_DATA_PORT,    pos & 0x00FF);
 }
 
-char * fb = (char *) 0x000B8000;
+char * fb = (char *) 0xC00B8000;
 
 void fb_write_cell(unsigned int i, char c, unsigned char fg, unsigned char bg) {
     fb[i * 2] = c;
