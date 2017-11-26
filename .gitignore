@@ -2,4 +2,5 @@
 *.elf
 *.log
 /os.iso
-/disk/
+/img/
+/OVMF.fd

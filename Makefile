@@ -6,21 +6,22 @@ LDFLAGS = -T link.ld -melf_i386
 AS = nasm
 ASFLAGS = -f elf -Fdwarf -g
 
-all: os.iso
+all: bootia32.efi hello kernel.elf OVMF.fd
+
+OVMF.fd:
+	cp /root/edk2-vUDK2017/Build/OvmfIa32/RELEASE_GCC5/FV/OVMF.fd .
 
 kernel.elf: $(OBJECTS)
-	echo "ld $(LDFLAGS) $(OBJECTS) -o kernel.elf"
-	ld $(LDFLAGS) $(OBJECTS) -o kernel.elf
+	mkdir -p img/boot
+	ld $(LDFLAGS) $(OBJECTS) -o img/boot/kernel.elf
 
 hello:
-	mkdir -p disk/modules
-	nasm -f bin hello.s -o disk/modules/hello
+	mkdir -p img/modules
+	nasm -f bin hello.s -o img/modules/hello
 
-os.iso: kernel.elf hello
-	mkdir -p disk/boot/grub
-	cp grub.cfg disk/boot/grub
-	cp kernel.elf disk/boot/kernel.elf
-	grub-mkrescue -o os.iso disk
+bootia32.efi:
+	mkdir -p img/efi/boot
+	grub-mkimage -O i386-efi -o img/efi/boot/bootia32.efi -p "" part_msdos part_gpt fat normal multiboot video_cirrus video video_fb videoinfo
 
 %.o: %.c
 	$(CC) $(CFLAGS)  $< -o $@
@@ -29,4 +30,4 @@ os.iso: kernel.elf hello
 	$(AS) $(ASFLAGS) $< -o $@
 
 clean:
-	rm -rf *.o kernel.elf os.iso disk
+	rm -rf *.o img

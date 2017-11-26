@@ -31,6 +31,7 @@ x86:
 
 qemu fullscreen:
 * `s/[NSScreen mainScreen]/[[NSScreen screens] objectAtIndex:0]/` (in QEMU source) let's you start the QEMU screen in a specific display, rather than the one currently receiving keyboard events
+* Get help on qemu build options with `./configure -h`. Currently using `./configure --target-list=x86_64-softmmu`
 
 Storing programs in modules:
 * [BITS 32] seems to be necessary
@@ -41,3 +42,6 @@ Paging:
 * Unlike in ^^, GRUB appears to know to use the physical address of the entrypoint
 * Note that it is the _physical_ address of the page directory that must be loaded into cr3
 * mem_* fields in multiboot info structure seem to be populated even without setting the corresponding flag in the multiboot header, but will set anyway
+
+UEFI:
+* Using 32-bit OVMF so that gdb still works normally with qemu. TODO: See if there are other ways to handle that.

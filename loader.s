@@ -46,6 +46,8 @@ align 4
 
 loader:
         ; NOTE: Make sure not to touch ebx before kmain
+        ; mov eax, 0xCAFEBABE
+        ; jmp $
         lea eax, [page_directory - KERNEL_VIRTUAL_BASE]
         mov cr3, eax
 

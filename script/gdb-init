@@ -1,2 +1,2 @@
-symbol-file kernel.elf
+symbol-file img/boot/kernel.elf
 target remote docker.for.mac.localhost:1234
