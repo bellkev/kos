@@ -8,8 +8,14 @@ extern kernel_physical_end
 MAGIC_NUMBER equ 0x1BADB002
 ALIGN_MODULES equ 1<<0
 MEM_INFO equ 1<<1
-FLAGS equ ALIGN_MODULES
+VIDEO_MODE_INFO equ 0<<2
+FLAGS equ ALIGN_MODULES | MEM_INFO | VIDEO_MODE_INFO
 CHECKSUM equ -(MAGIC_NUMBER + FLAGS)
+GRAPHICS_MODE_TYPE equ 1
+GRAPHICS_WIDTH equ 0x50
+GRAPHICS_HEIGHT equ 0x19
+GRAPHICS_DEPTH equ 0
+
 KERNEL_STACK_SIZE equ 4096
 LETTER_A equ 0xf041
 LETTER_B equ 0xf042
@@ -43,6 +49,11 @@ align 4
         dd MAGIC_NUMBER
         dd FLAGS
         dd CHECKSUM
+        times 5 dd 0 ; Kernel load address fields, not used now
+        dd GRAPHICS_MODE_TYPE
+        dd GRAPHICS_WIDTH
+        dd GRAPHICS_HEIGHT
+        dd GRAPHICS_DEPTH
 
 loader:
         ; NOTE: Make sure not to touch ebx before kmain

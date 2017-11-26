@@ -6,7 +6,7 @@ LDFLAGS = -T link.ld -melf_i386
 AS = nasm
 ASFLAGS = -f elf -Fdwarf -g
 
-all: bootia32.efi hello kernel.elf OVMF.fd
+all: bootia32.efi hello kernel.elf img/boot/grub/grub.cfg OVMF.fd
 
 OVMF.fd:
 	cp /root/edk2-vUDK2017/Build/OvmfIa32/RELEASE_GCC5/FV/OVMF.fd .
@@ -21,7 +21,11 @@ hello:
 
 bootia32.efi:
 	mkdir -p img/efi/boot
-	grub-mkimage -O i386-efi -o img/efi/boot/bootia32.efi -p "" part_msdos part_gpt fat normal multiboot video_cirrus video video_fb videoinfo
+	grub-mkimage -O i386-efi -o img/efi/boot/bootia32.efi -p "/boot/grub" part_msdos part_gpt fat normal multiboot video_cirrus video video_fb videoinfo
+
+img/boot/grub/grub.cfg:
+	mkdir -p img/boot/grub
+	cp grub.cfg img/boot/grub/
 
 %.o: %.c
 	$(CC) $(CFLAGS)  $< -o $@

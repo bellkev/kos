@@ -200,25 +200,24 @@ void kmain(unsigned int ebx, struct kernel_mem_info kmi) {
     log_hex(ebx);
     UNUSED(kmi);
     multiboot_info_t *mbinfo = (multiboot_info_t *) VIRTUAL_ADDR(ebx);
-    UNUSED(mbinfo);
 
-    /* if (!(MULTIBOOT_INFO_MODS & mbinfo->flags)) { */
-    /*     log("No modules loaded"); */
-    /*     return; */
-    /* } */
-    /* if (!(MULTIBOOT_INFO_MEMORY & mbinfo->flags)) { */
-    /*     log("Memory info unavailable"); */
-    /*     return; */
-    /* } */
-    /* if (mbinfo->mods_count != 1) { */
-    /*     log("Unexpected number of modules loaded"); */
-    /*     return; */
-    /* } */
+    if (!(MULTIBOOT_INFO_MODS & mbinfo->flags)) {
+        log("No modules loaded");
+        return;
+    }
+    if (!(MULTIBOOT_INFO_MEMORY & mbinfo->flags)) {
+        log("Memory info unavailable");
+        return;
+    }
+    if (mbinfo->mods_count != 1) {
+        log("Unexpected number of modules loaded");
+        return;
+    }
 
-    /* multiboot_module_t *mod = (multiboot_module_t *) VIRTUAL_ADDR(mbinfo->mods_addr); */
-    /* void(*start_program)(void) = (void(*)(void)) VIRTUAL_ADDR(mod->mod_start); */
+    multiboot_module_t *mod = (multiboot_module_t *) VIRTUAL_ADDR(mbinfo->mods_addr);
+    void(*start_program)(void) = (void(*)(void)) VIRTUAL_ADDR(mod->mod_start);
 
-    /* start_program(); */
+    start_program();
 
 
     init_segmentation();
