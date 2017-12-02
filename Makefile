@@ -21,7 +21,7 @@ hello:
 
 bootia32.efi:
 	mkdir -p img/efi/boot
-	grub-mkimage -O i386-efi -o img/efi/boot/bootia32.efi -p "/boot/grub" part_msdos part_gpt fat normal multiboot video_cirrus video video_fb videoinfo
+	grub-mkimage -O i386-efi -o img/efi/boot/bootia32.efi -p "/boot/grub" part_msdos part_gpt fat normal multiboot video_cirrus video video_fb videoinfo efi_uga efi_gop all_video
 
 img/boot/grub/grub.cfg:
 	mkdir -p img/boot/grub

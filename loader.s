@@ -91,6 +91,9 @@ higher_half:
         ; should be necessary. We now have a higher-half kernel.
         mov esp, kernel_stack + KERNEL_STACK_SIZE           ; set up the stack
 
+        ; Pass page directory location to kmain
+        push page_directory
+
         ; Pass info about where the kernel is loaded
         push kernel_physical_end
         push kernel_physical_start

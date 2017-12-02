@@ -193,13 +193,20 @@ struct kernel_mem_info {
 } __attribute__((packed));
 
 
-void kmain(unsigned int ebx, struct kernel_mem_info kmi) {
+void kmain(unsigned int ebx, struct kernel_mem_info kmi, unsigned int * page_directory) {
 
     serial_init();
     log("EBX:");
     log_hex(ebx);
     UNUSED(kmi);
     multiboot_info_t *mbinfo = (multiboot_info_t *) VIRTUAL_ADDR(ebx);
+
+    // Map framebuffer to next 4mb page after the page the kernel is in
+    page_directory[(0xC0000000 >> 22) + 1] = mbinfo->framebuffer_addr | 0x83;
+    unsigned int * fb = (unsigned int *)0xC0400000;
+    for (int i = 0; i < 100000; i++) {
+        fb[i] = 0xffffffff;
+    }
 
     if (!(MULTIBOOT_INFO_MODS & mbinfo->flags)) {
         log("No modules loaded");

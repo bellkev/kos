@@ -45,3 +45,4 @@ Paging:
 
 UEFI:
 * Using 32-bit OVMF so that gdb still works normally with qemu. TODO: See if there are other ways to handle that.
+* Need to handle framebuffer at high address...
