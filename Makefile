@@ -1,4 +1,4 @@
-OBJECTS = interrupt_macro.o interrupt.o io.o pic.o loader.o kmain.o serial.o utils.o framebuffer.o scancodes.o
+OBJECTS = $(patsubst %.c,%.o,$(wildcard *.c)) $(patsubst %.s,%.o,$(wildcard *.s))
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
 	 -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c -ggdb
@@ -6,10 +6,14 @@ LDFLAGS = -T link.ld -melf_i386
 AS = nasm
 ASFLAGS = -f elf -Fdwarf -g
 
-all: bootia32.efi hello kernel.elf img/boot/grub/grub.cfg OVMF.fd
+GRUB_MODULES = part_msdos part_gpt fat normal multiboot video_cirrus video video_fb videoinfo efi_uga efi_gop all_video
+
+all: bootia32.efi bootx64.efi hello kernel.elf grub.cfg OVMF.fd
+
+# Note: Almost all targets are "phony", since everything's so fast and it's a pain to deal with the directories properly
 
 OVMF.fd:
-	cp /root/edk2-vUDK2017/Build/OvmfIa32/RELEASE_GCC5/FV/OVMF.fd .
+	cp /root/edk2-vUDK2017/Build/Ovmf3264/RELEASE_GCC5/FV/OVMF.fd .
 
 kernel.elf: $(OBJECTS)
 	mkdir -p img/boot
@@ -21,9 +25,15 @@ hello:
 
 bootia32.efi:
 	mkdir -p img/efi/boot
-	grub-mkimage -O i386-efi -o img/efi/boot/bootia32.efi -p "/boot/grub" part_msdos part_gpt fat normal multiboot video_cirrus video video_fb videoinfo efi_uga efi_gop all_video
+	grub-mkimage -O i386-efi -o img/efi/boot/bootia32.efi -p "/boot/grub" $(GRUB_MODULES)
 
-img/boot/grub/grub.cfg:
+bootx64.efi:
+	mkdir -p img/efi/boot
+	grub-mkimage -O x86_64-efi -o img/efi/boot/bootx64.efi -p "/boot/grub" $(GRUB_MODULES)
+
+# The existence of the original file in the root will prevent this target from running without .PHONY
+.PHONY: grub.cfg
+grub.cfg:
 	mkdir -p img/boot/grub
 	cp grub.cfg img/boot/grub/
 
