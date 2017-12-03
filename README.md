@@ -46,3 +46,11 @@ Paging:
 UEFI:
 * Using 32-bit OVMF so that gdb still works normally with qemu. TODO: See if there are other ways to handle that.
 * Need to handle framebuffer at high address...
+
+Graphics/Device Notes:
+* PCI(e): Standard bus type, and protocols to get info about connected devices
+* APM, ACPI: Power managment standards (related to device detection too?)
+* Multiboot seems to be more geared to some older VGA/text standards that are considered "legacy" today
+* UEFI (or at least tianocore/edk2 firmware) doesn't seem to be able to provide a text-mode framebuffer
+* Documentation/devicetree/usage-model.txt is interesting, but appears most associated with PowerPC ("some level of support" on x86)
+* EFI and Linux: https://lwn.net/Articles/632528/

@@ -9,7 +9,9 @@ RUN cd grub-2.02 && ./configure --target=x86_64 --with-platform=efi && make inst
 
 # OVMF and its deps:
 RUN apt-get update; apt-get install -y uuid-dev python acpica-tools
-RUN curl -L -o edk2.tar.gz https://github.com/tianocore/edk2/archive/vUDK2017.tar.gz && tar -xzf edk2.tar.gz && cd edk2-vUDK2017 && OvmfPkg/build.sh -a IA32 -a X64 -b RELEASE
+# Note that multiple `-a` args to support both x64 and ia32 seem to be supported,
+# but the x64 image seems to just clobber the ia32 in-place
+RUN curl -L -o edk2.tar.gz https://github.com/tianocore/edk2/archive/vUDK2017.tar.gz && tar -xzf edk2.tar.gz && cd edk2-vUDK2017 && OvmfPkg/build.sh -a IA32 -b RELEASE
 
 # Sometimes grub complains if this is missing
 # RUN apt-get update; apt-get install -y libfreetype6-dev ttf-unifont

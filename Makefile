@@ -13,7 +13,7 @@ all: bootia32.efi bootx64.efi hello kernel.elf grub.cfg OVMF.fd
 # Note: Almost all targets are "phony", since everything's so fast and it's a pain to deal with the directories properly
 
 OVMF.fd:
-	cp /root/edk2-vUDK2017/Build/Ovmf3264/RELEASE_GCC5/FV/OVMF.fd .
+	cp /root/edk2-vUDK2017/Build/OvmfIa32/RELEASE_GCC5/FV/OVMF.fd .
 
 kernel.elf: $(OBJECTS)
 	mkdir -p img/boot
@@ -44,4 +44,4 @@ grub.cfg:
 	$(AS) $(ASFLAGS) $< -o $@
 
 clean:
-	rm -rf *.o img
+	rm -rf *.o img OVMF.fd
