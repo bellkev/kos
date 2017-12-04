@@ -46,6 +46,8 @@ Paging:
 UEFI:
 * Using 32-bit OVMF so that gdb still works normally with qemu. TODO: See if there are other ways to handle that.
 * Need to handle framebuffer at high address...
+* Note that 64-bit tianocore/ovmf seems to use /efi/boot/bootia32.efi just fine, but the compute stick doesn't.
+  (Apparently this is optional according to the spec.)
 
 Graphics/Device Notes:
 * PCI(e): Standard bus type, and protocols to get info about connected devices
