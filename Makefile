@@ -8,7 +8,14 @@ ASFLAGS = -f elf -Fdwarf -g
 
 GRUB_MODULES = part_msdos part_gpt fat normal multiboot video_cirrus video video_fb videoinfo efi_uga efi_gop all_video
 
-all: bootia32.efi bootx64.efi hello kernel.elf grub.cfg OVMF.fd
+all: os.iso
+
+iso: os.iso
+
+os.iso: kernel.elf hello grub.cfg
+	grub-mkrescue -o os.iso img
+
+uefi: bootia32.efi bootx64.efi hello kernel.elf grub.cfg OVMF.fd
 
 # Note: Almost all targets are "phony", since everything's so fast and it's a pain to deal with the directories properly
 
@@ -44,4 +51,4 @@ grub.cfg:
 	$(AS) $(ASFLAGS) $< -o $@
 
 clean:
-	rm -rf *.o img OVMF.fd
+	rm -rf *.o img OVMF.fd os.iso

@@ -1,8 +1,24 @@
 #!/bin/bash
 
-set -e
+set -eux
+
+mode=${MODE:-iso}
+
+case $mode in
+    iso)
+        qemu_args="-cdrom os.iso"
+        ;;
+    uefi)
+        qemu_args="-hda fat:rw:img -bios OVMF.fd"
+        ;;
+    *)
+        echo "Unsupported boot mode: $mode" 2>&1; exit 1
+        ;;
+esac
 
 rm *.log || true
 docker build -t bellkev/kos .
-make clean && docker run -v $PWD:/opt/kos bellkev/kos make
-qemu-system-i386 -bios OVMF.fd -D qemu.log -hda fat:rw:img -monitor stdio -vga cirrus -serial file:kernel.log -full-screen -nodefaults -gdb tcp:0.0.0.0:1234 -S
+make clean && docker run -v $PWD:/opt/kos bellkev/kos make $mode
+qemu-system-i386 -D qemu.log -monitor stdio -vga cirrus \
+                 -serial file:kernel.log -full-screen \
+                 -nodefaults -gdb tcp:0.0.0.0:1234 -S $qemu_args
