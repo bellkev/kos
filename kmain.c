@@ -224,7 +224,7 @@ void kmain(unsigned int ebx, struct kernel_mem_info kmi, unsigned int * page_dir
     multiboot_module_t *mod = (multiboot_module_t *) VIRTUAL_ADDR(mbinfo->mods_addr);
     void(*start_program)(void) = (void(*)(void)) VIRTUAL_ADDR(mod->mod_start);
 
-    start_program();
+    UNUSED(start_program);
 
 
     init_segmentation();

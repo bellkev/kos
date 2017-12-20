@@ -17,6 +17,8 @@ os.iso: kernel.elf hello grub.cfg
 
 uefi: bootia32.efi bootx64.efi hello kernel.elf grub.cfg OVMF.fd
 
+uefi-shell: uefi
+
 # Note: Almost all targets are "phony", since everything's so fast and it's a pain to deal with the directories properly
 
 OVMF.fd:

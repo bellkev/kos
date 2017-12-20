@@ -11,6 +11,9 @@ case $mode in
     uefi)
         qemu_args="-hda fat:rw:img -bios OVMF.fd"
         ;;
+    uefi-shell)
+        qemu_args="-bios OVMF.fd"
+        ;;
     *)
         echo "Unsupported boot mode: $mode" 2>&1; exit 1
         ;;
@@ -21,4 +24,5 @@ docker build -t bellkev/kos .
 make clean && docker run -v $PWD:/opt/kos bellkev/kos make $mode
 qemu-system-i386 -D qemu.log -monitor stdio -vga cirrus \
                  -serial file:kernel.log -full-screen \
-                 -nodefaults -gdb tcp:0.0.0.0:1234 -S $qemu_args
+                 -nodefaults -gdb tcp:0.0.0.0:1234 \
+                 $qemu_args "$@"
