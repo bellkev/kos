@@ -1,1 +1,1 @@
-void fb_write(int * cursor, char c);
+void fb_write(char c);
