@@ -182,8 +182,8 @@ void interrupt_handler(struct cpu_state cpu, unsigned int interrupt, struct stac
     /* Only listen to the keyboard */
     if (interrupt >= 0x20 && interrupt < 0x30) {
         unsigned char key = read_scan_code();
-        log("Key scan code received:");
-        log_hex(key);
+        /* log("Key scan code received:"); */
+        /* log_hex(key); */
         int ascii = code_to_ascii(key);
         if (ascii) {
             fb_write(ascii);

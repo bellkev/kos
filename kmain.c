@@ -19,32 +19,61 @@ struct kernel_mem_info {
     unsigned int kernel_physical_end;
 } __attribute__((packed));
 
+void log_mmap(multiboot_uint32_t addr, multiboot_uint32_t length) {
+    /* This scheme of checking the 'size' field is apparently so
+       that the multiboot spec can add extra fields in the future
+       without breaking things.
+       (Probably not likely to actually happen for multiboot 1...) */
+    multiboot_memory_map_t *entry = (multiboot_memory_map_t*)addr;
+    while ((multiboot_uint32_t)entry < (addr + length)) {
+        log("mmap entry at ");
+        log_hex_n(entry->addr);
+        log("size: ");
+        log_hex_n(entry->len);
+        log("type: ");
+        switch(entry->type) {
+        case MULTIBOOT_MEMORY_AVAILABLE:
+            log_n("AVAILABLE");
+            break;
+        case MULTIBOOT_MEMORY_RESERVED:
+            log_n("RESERVED");
+            break;
+        default:
+            log_n("UNKNOWN");
+        }
+        multiboot_uint32_t next_addr = (multiboot_uint32_t)entry + entry->size + sizeof(entry->size);
+        entry = (multiboot_memory_map_t*)next_addr;
+    }
+}
+
 void kmain(unsigned int ebx, struct kernel_mem_info kmi, unsigned int * page_directory) {
 
     serial_init();
-    log("EBX:");
-    log_hex(ebx);
     UNUSED(kmi);
     multiboot_info_t *mbinfo = (multiboot_info_t *) VIRTUAL_ADDR(ebx);
-
-    // Map framebuffer to next 4mb page after the page the kernel is in
-    page_directory[(0xC0000000 >> 22) + 1] = mbinfo->framebuffer_addr | 0x83;
-    unsigned int * fb = (unsigned int *)0xC0400000;
-    for (int i = 0; i < 100000; i++) {
-        fb[i] = 0xffffffff;
-    }
 
     if (!(MULTIBOOT_INFO_MODS & mbinfo->flags)) {
         log("No modules loaded");
         return;
     }
-    if (!(MULTIBOOT_INFO_MEMORY & mbinfo->flags)) {
+    if (!((MULTIBOOT_INFO_MEMORY | MULTIBOOT_INFO_MEM_MAP) & mbinfo->flags)) {
         log("Memory info unavailable");
         return;
     }
     if (mbinfo->mods_count != 1) {
         log("Unexpected number of modules loaded");
         return;
+    }
+
+    log_mmap(VIRTUAL_ADDR(mbinfo->mmap_addr), mbinfo->mmap_length);
+    log_n("Framebuffer:");
+    log_hex_n(mbinfo->framebuffer_addr);
+
+    // Map framebuffer to next 4mb page after the page the kernel is in
+    page_directory[(0xC0000000 >> 22) + 1] = mbinfo->framebuffer_addr | 0x83;
+    unsigned int * fb = (unsigned int *)0xC0400000;
+    for (int i = 0; i < 100000; i++) {
+        fb[i] = 0xffffffff;
     }
 
     multiboot_module_t *mod = (multiboot_module_t *) VIRTUAL_ADDR(mbinfo->mods_addr);
@@ -64,5 +93,4 @@ void kmain(unsigned int ebx, struct kernel_mem_info kmi, unsigned int * page_dir
         }
         fb_write(message[i]);
     }
-    log("In the higher half!");
 }

@@ -7,6 +7,10 @@ void log(char * s) {
         }
         serial_write(s[i]);
     }
+}
+
+void log_n(char * s) {
+    log(s);
     serial_write(10);
 }
 
@@ -24,6 +28,10 @@ void log_hex(int d) {
     for (int i = 28; i >= 0; i-=4) {
         serial_write(ascii_codes[(d >> i) & 0xf]);
     }
+}
 
+
+void log_hex_n(int d) {
+    log_hex(d);
     serial_write(10);
 }
