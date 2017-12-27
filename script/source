@@ -1,0 +1,11 @@
+db() {
+  script/docker-build.sh
+}
+
+run() {
+  script/run.sh "$@"
+}
+
+t() {
+  script/test.sh
+}

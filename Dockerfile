@@ -26,5 +26,11 @@ RUN grub-mkfont -o /usr/local/share/grub/unicode.pf2 /usr/share/fonts/truetype/u
 RUN curl -L -o edk2.tar.gz https://github.com/tianocore/edk2/archive/vUDK2017.tar.gz \
   && tar -xzf edk2.tar.gz && cd edk2-vUDK2017 && OvmfPkg/build.sh -a IA32 -b RELEASE
 
+# 32-bit stuff for testing
+RUN apt-get update; apt-get install -y libc6-dev-i386
+
+# for tests
+RUN apt-get update; apt-get install -y ctags
+
 RUN mkdir -p /opt/kos
 WORKDIR /opt/kos
