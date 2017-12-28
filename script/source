@@ -9,3 +9,7 @@ run() {
 t() {
   script/test.sh
 }
+
+dr() {
+     docker run -it --detach-keys="ctrl-u,u" -v $PWD:/opt/kos --cap-add=SYS_PTRACE --security-opt seccomp=unconfined bellkev/kos bash
+}
