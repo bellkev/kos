@@ -50,6 +50,10 @@ grub.cfg:
 
 iso: os.iso
 
+grub-iso:
+	mkdir -p img
+	grub-mkrescue -o os.iso img
+
 os.iso: kernel.elf hello grub.cfg
 	grub-mkrescue -o os.iso img
 

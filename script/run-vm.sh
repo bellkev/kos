@@ -8,6 +8,9 @@ case $mode in
     iso)
         qemu_args="-cdrom os.iso"
         ;;
+    grub-iso)
+        qemu_args="-cdrom os.iso"
+        ;;
     uefi)
         qemu_args="-hda fat:rw:img -bios OVMF.fd"
         ;;
@@ -19,8 +22,9 @@ case $mode in
         ;;
 esac
 
+rm kernel.log || true
 make clean && docker run -v $PWD:/opt/kos bellkev/kos make $mode
 qemu-system-i386 -D qemu.log -monitor stdio -vga cirrus \
                  -serial file:kernel.log -full-screen \
                  -nodefaults -gdb tcp:0.0.0.0:1234 \
-                 $qemu_args "$@"
+                 $qemu_args "$@" -M q35 #-m 4096

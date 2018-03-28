@@ -27,9 +27,11 @@ void log_mmap(multiboot_uint32_t addr, multiboot_uint32_t length) {
     multiboot_memory_map_t *entry = (multiboot_memory_map_t*)addr;
     while ((multiboot_uint32_t)entry < (addr + length)) {
         log("mmap entry at ");
-        log_hex_n(entry->addr);
+        log_hex_n(entry->addr >> 32);
+        log_hex_n(entry->addr & 0xffffffff);
         log("size: ");
-        log_hex_n(entry->len);
+        log_hex_n(entry->len >> 32);
+        log_hex_n(entry->len & 0xffffffff);
         log("type: ");
         switch(entry->type) {
         case MULTIBOOT_MEMORY_AVAILABLE:
