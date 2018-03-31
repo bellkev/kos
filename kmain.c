@@ -5,6 +5,7 @@
 #include "interrupts.h"
 #include "io.h"
 #include "pic.h"
+#include "pci.h"
 #include "segmentation.h"
 #include "serial.h"
 #include "utils.h"
@@ -46,18 +47,6 @@ void log_mmap(multiboot_uint32_t addr, multiboot_uint32_t length) {
         multiboot_uint32_t next_addr = (multiboot_uint32_t)entry + entry->size + sizeof(entry->size);
         entry = (multiboot_memory_map_t*)next_addr;
     }
-}
-
-void log_pci(unsigned char bus, unsigned char dev, unsigned char func) {
-    unsigned int val = 0x80000000 |
-        (bus << 16) |
-        (dev << 11) |
-        (func << 8);
-    log_n("VAL:");
-    log_hex_n(val);
-    outd(0x0CF8, val);
-    log_n("PCI info:");
-    log_hex_n(0xFFFF & ind(0x0CFC));
 }
 
 void kmain(unsigned int ebx, struct kernel_mem_info kmi, unsigned int * page_directory) {
