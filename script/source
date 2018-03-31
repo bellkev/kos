@@ -3,7 +3,7 @@ db() {
 }
 
 run() {
-  script/run.sh "$@"
+  script/run.sh -device qemu-xhci -device usb-kbd "$@"
 }
 
 t() {

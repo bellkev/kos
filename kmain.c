@@ -48,6 +48,18 @@ void log_mmap(multiboot_uint32_t addr, multiboot_uint32_t length) {
     }
 }
 
+void log_pci(unsigned char bus, unsigned char dev, unsigned char func) {
+    unsigned int val = 0x80000000 |
+        (bus << 16) |
+        (dev << 11) |
+        (func << 8);
+    log_n("VAL:");
+    log_hex_n(val);
+    outd(0x0CF8, val);
+    log_n("PCI info:");
+    log_hex_n(0xFFFF & ind(0x0CFC));
+}
+
 void kmain(unsigned int ebx, struct kernel_mem_info kmi, unsigned int * page_directory) {
 
     serial_init();
@@ -67,9 +79,10 @@ void kmain(unsigned int ebx, struct kernel_mem_info kmi, unsigned int * page_dir
         return;
     }
 
-    log_mmap(VIRTUAL_ADDR(mbinfo->mmap_addr), mbinfo->mmap_length);
-    log_n("Framebuffer:");
-    log_hex_n(mbinfo->framebuffer_addr);
+    /* log_mmap(VIRTUAL_ADDR(mbinfo->mmap_addr), mbinfo->mmap_length); */
+    /* log_n("Framebuffer:"); */
+    /* log_hex_n(mbinfo->framebuffer_addr); */
+    log_pci(0,0,0);
 
     // Map framebuffer to next 4mb page after the page the kernel is in
     page_directory[(0xC0000000 >> 22) + 1] = mbinfo->framebuffer_addr | 0x83;

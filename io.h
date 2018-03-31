@@ -14,3 +14,5 @@ void outb(unsigned short port, unsigned char data);
  */
 unsigned char inb(unsigned short port);
 
+void outd(unsigned short port, unsigned int data);
+unsigned int ind(unsigned short port);
