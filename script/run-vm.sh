@@ -22,7 +22,6 @@ case $mode in
         ;;
 esac
 
-rm kernel.log || true
 make clean && docker run -v $PWD:/opt/kos bellkev/kos make $mode
 qemu-system-i386 -D qemu.log -monitor stdio -vga cirrus \
                  -serial file:kernel.log -full-screen \

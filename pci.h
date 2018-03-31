@@ -3,4 +3,4 @@ struct pci_config {
     unsigned short device_id;
 };
 
-void log_pci(unsigned char bus, unsigned char dev, unsigned char func);
+void log_pci();

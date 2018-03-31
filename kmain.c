@@ -71,7 +71,7 @@ void kmain(unsigned int ebx, struct kernel_mem_info kmi, unsigned int * page_dir
     /* log_mmap(VIRTUAL_ADDR(mbinfo->mmap_addr), mbinfo->mmap_length); */
     /* log_n("Framebuffer:"); */
     /* log_hex_n(mbinfo->framebuffer_addr); */
-    log_pci(0,0,0);
+    log_pci();
 
     // Map framebuffer to next 4mb page after the page the kernel is in
     page_directory[(0xC0000000 >> 22) + 1] = mbinfo->framebuffer_addr | 0x83;
